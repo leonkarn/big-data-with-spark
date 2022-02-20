@@ -1,6 +1,7 @@
 # BIG DATA ASSIGNMENT
 
 You will need to have java and also python
+
 Also install the dependencies by using this command
 ~~~
 pip install -r requirements.txt
