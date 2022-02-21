@@ -14,8 +14,8 @@ class Rating:
         self.df = self.spark.read.format(self.frmt).schema(self.schema).load(self.path, sep='\t')
 
     def insert_or_update_to_delta(self, file_name):
-        if DeltaTable.isDeltaTable(self.spark, file_name):
-            deltaTable = DeltaTable.forPath(self.spark, file_name)
+        if DeltaTable.isDeltaTable(self.spark, 'delta lake/'+file_name):
+            deltaTable = DeltaTable.forPath(self.spark, 'delta lake/'+file_name)
             deltaTable.alias("old_ratings").merge(
                 self.df.alias("new_ratings"),
                 "old_ratings.user_id = new_ratings.user_id and old_ratings.item_id = new_ratings.item_id"). \
@@ -23,5 +23,5 @@ class Rating:
                 .whenNotMatchedInsertAll() \
                 .execute()
         else:
-            self.df.write.format("delta").mode("append").partitionBy('user_id').save('delta lake/'+file_name)
+            self.df.write.format("delta").partitionBy('user_id').save('delta lake/'+file_name)
 

@@ -51,7 +51,7 @@ def main(url, zip_file):
 
     # TRANSFORMATION
     newmovie.export_transposed_movie_genre('movie_genre_transposed.csv')
-    newmovie.export_top_films(newrating.df, 'top_movies.csv')
+    newmovie.export_top_films('top_movies.csv')
 
 
 if __name__ == "__main__":
