@@ -17,12 +17,14 @@ def download_data(url, zip_file):
     # delete zip file
     os.remove(zip_file)
 
+
 def create_folders():
     if not os.path.isdir('delta lake'):
         os.mkdir('delta lake')
 
     if not os.path.isdir('results'):
         os.mkdir('results')
+
 
 def main(url, zip_file):
     # Download our data
