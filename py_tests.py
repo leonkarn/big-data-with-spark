@@ -1,6 +1,7 @@
 import pyspark
 from delta import *
-from pyspark.sql.types import StructType, StructField, IntegerType, FloatType, StringType
+from movie import Movie
+from rating import Rating
 
 builder = pyspark.sql.SparkSession.builder.appName("MyApp") \
     .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
@@ -15,42 +16,37 @@ def test_validate_rating_data_lake():
 
 def test_validate_movie_data_lake():
     records_count = spark.read.format('delta').load('delta lake/movies').count()
-    assert records_count >=1
+    assert records_count >= 1
 
 
 def test_rating_schema_inserted():
-    ratings_schema = StructType([
-      StructField("user_id", StringType(), True), \
-      StructField("item_id", IntegerType(), True), \
-      StructField("rating", FloatType(), True), \
-      StructField("Timestamp", IntegerType(), True)])
-    ratings = spark.read.format('csv').schema(ratings_schema).load('ml-100k/u.data', sep='\t').schema
-    delta_rating = spark.read.format('delta').load('delta lake/ratings').schema
-    assert ratings == delta_rating
+    ratings_ingested = Rating(spark, 'ml-100k/u.data')
+    delta_ratings = spark.read.format('delta').load('delta lake/ratings')
+    assert ratings_ingested.schema == delta_ratings.schema
 
 
 def test_movies_schema_inserted():
-    movies = spark.read.csv('ml-100k/u.item', sep='|'). \
-      toDF("movie_id", "movie_title", "release_date",
-           "video_release_date",
-           "IMDb_URL", "unknown",
-           "Action", "Adventure", "Animation",
-           "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy",
-           "Film_Noir", "Horror", "Musical", "Mystery", "Romance", "Sci_Fi",
-           "Thriller", "War", "Western").schema
-
-    delta_movies = spark.read.format('delta').load('delta lake/movies').schema
-    assert movies == delta_movies
+    ingested_movies = Movie(spark, 'ml-100k/u.item')
+    delta_movies = spark.read.format('delta').load('delta lake/movies')
+    assert ingested_movies.df.schema == delta_movies.schema
 
 
 def test_ratings_duplicates_inserted():
-    ratings_schema = StructType([
-        StructField("user_id", StringType(), True), \
-        StructField("item_id", IntegerType(), True), \
-        StructField("rating", FloatType(), True), \
-        StructField("Timestamp", IntegerType(), True)])
-    ratings = spark.read.format('csv').schema(ratings_schema).load('ml-100k/u.data', sep='\t')
-    assert ratings.groupby(['user_id', 'item_id']).count().where('count > 1').count() == 0
+    ratings_ingested = Rating(spark, 'ml-100k/u.data').df
+    assert ratings_ingested.groupby(['user_id', 'item_id']).count().where('count > 1').count() == 0
+
+
+def test_check_delta_lake_ratings_duplicates():
+    spark.read.format('delta').load('delta lake/ratings').createOrReplaceTempView("ratings")
+    count_duplicates = spark.sql("""
+            select user_id,item_id, count(*)
+            from ratings
+            group by user_id, item_id
+            having count(*) > 1
+            """
+           ).count()
+    assert count_duplicates == 0
+
 
 
 
