@@ -21,9 +21,9 @@ pytest py_tests.py
 
 ### Staging
 
-The results were saved in `delta lake` folder
+The ingested data were saved in `delta lake` folder
 
 
 ### Transformation
 
-The calculations were saved in `results` folder 
+The transformed data were saved in `results` folder 
