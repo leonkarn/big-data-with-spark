@@ -31,10 +31,10 @@ def main(url, zip_file):
     if not os.path.isdir('ml-100k'):
         download_data(url, zip_file)
 
-    # Create delta lake and results if they don t exist
+    # Create delta lake and results folder to save transformation results if they don t exist
     create_folders()
 
-    # Start SparkSessions
+    # Start SparkSession
     builder = pyspark.sql.SparkSession.builder.appName("MyApp") \
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
@@ -43,10 +43,12 @@ def main(url, zip_file):
     # STAGING
     # rating
     newrating = Rating(spark, 'ml-100k/u.data')
+    # ingest to delta lake or update it
     newrating.insert_or_update_to_delta('ratings')
 
     # movie
     newmovie = Movie(spark, 'ml-100k/u.item')
+    # ingest to delta lake
     newmovie.ingest_to_delta('movies')
 
     # TRANSFORMATION

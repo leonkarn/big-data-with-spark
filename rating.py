@@ -13,7 +13,14 @@ class Rating:
             StructField("Timestamp", IntegerType(), True)])
         self.df = self.spark.read.format(self.frmt).schema(self.schema).load(self.path, sep='\t')
 
+    # update a row if it exists, else the row should be inserted
     def insert_or_update_to_delta(self, file_name):
+        """
+        Ingest the data to delta lake.If there is a match in user id and movie id in an existing delta lake
+        it updates with the new rating.
+
+        :param file_name: name of the folder where the parquets are going to be saved in the delta lake
+        """
         if DeltaTable.isDeltaTable(self.spark, 'delta lake/'+file_name):
             deltaTable = DeltaTable.forPath(self.spark, 'delta lake/'+file_name)
             deltaTable.alias("old_ratings").merge(

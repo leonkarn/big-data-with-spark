@@ -1,4 +1,4 @@
-# BIG DATA ASSIGNMENT
+# ASOS BIG DATA ASSIGNMENT
 
 You will need to have java and also python
 
@@ -12,7 +12,7 @@ To run the program run this command in your terminal after having installed the 
 python pipeline.py -u https://files.grouplens.org/datasets/movielens/ml-100k.zip -z 'ml-100k.zip'
 ~~~
 
-To run the tests run this command in your terminal
+To run the tests run this command in your terminal (Run tests only after having run the program with the command above)
 
 ~~~
 pytest py_tests.py
@@ -21,9 +21,9 @@ pytest py_tests.py
 
 ### Staging
 
-The ingested data were saved in `delta lake` folder
+The ingested data are saved in `delta lake` folder
 
 
 ### Transformation
 
-The transformed data were saved in `results` folder 
+The transformed data are saved in `results` folder 
