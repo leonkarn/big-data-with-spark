@@ -17,7 +17,11 @@ To run the tests run this command in your terminal (Run tests only after having 
 ~~~
 pytest py_tests.py
 ~~~
+## Structure
 
+There are two classes: movie and rating. Each of them is responsible for data about movie and rating respectively.
+
+Pipeline is our main function.
 
 ### Staging
 
